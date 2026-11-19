@@ -1,23 +1,23 @@
 (function () {
   const root = document.documentElement;
+  /* Temps mesurés depuis le LANCEMENT de Spotify (performance.now() part de 0
+     à l'ouverture de la page), pas depuis l'arrivée de ce script : avec le
+     Marketplace, le JS arrive plusieurs secondes après le CSS. */
   const DUREE_MIN = 2500;   /* durée minimale de l'écran de démarrage (ms) */
-  const DUREE_MAX = 12000;  /* sécurité : disparaît au plus tard après 12 s */
-  const debut = performance.now();
-  root.classList.add("gta-chargement");   /* le CSS ne cache Spotify que si ce script tourne */
+  const DUREE_MAX = 7500;   /* fin forcée (le CSS termine seul à 8 s sans JS) */
 
-  /* ===== 1. ÉCRAN DE DÉMARRAGE (affiché immédiatement) ===== */
+  /* ===== 1. ÉCRAN DE DÉMARRAGE =====
+     L'image, le halo et le logo sont déjà affichés par le CSS dès la première
+     image. Ce script ajoute par-dessus le reflet du logo et la progression. */
   let splash = null, barre = null, etape = null;
+  let fini = false;
   function creerSplash() {
-    if (splash || !document.body) return;
+    if (splash || fini || !document.body) return;
     splash = document.createElement("div");
     splash.id = "gta-splash";
     splash.innerHTML =
-      '<div class="gta-splash-bg"></div>' +
+      '<div class="gta-logo-reflet"><div class="gta-logo-bande"></div></div>' +
       '<div class="gta-splash-contenu">' +
-        '<div class="gta-logo">' +
-          '<div class="gta-logo-img"></div>' +
-          '<div class="gta-logo-reflet"><div class="gta-logo-bande"></div></div>' +
-        '</div>' +
         '<div class="gta-splash-titre">Chargement</div>' +
         '<div class="gta-splash-piste"><div class="gta-splash-barre"></div></div>' +
         '<div class="gta-splash-etape">Démarrage…</div>' +
@@ -30,45 +30,52 @@
     if (barre) barre.style.transform = "scaleX(" + p + ")";
     if (etape && texte && etape.textContent !== texte) etape.textContent = texte;
   };
-  if (document.body) creerSplash();
-  else document.addEventListener("DOMContentLoaded", creerSplash, { once: true });
 
   /* ===== 2. SUIVI DU VRAI CHARGEMENT ===== */
-  let fini = false;
-  const suivi = setInterval(() => {
-    creerSplash();
-    const S = window.Spicetify;
-    const ecoule = performance.now() - debut;
-    let p = 0.15, texte = "Démarrage…";
-    if (S && S.Player) {
-      p = 0.4; texte = "Connexion à Spotify…";
-      const vue = document.getElementById("main-view");
-      if (vue && vue.querySelector("section, [data-testid]")) {
-        p = 0.7; texte = "Chargement de l'interface…";
-        if (S.colorExtractor && S.Platform) {
-          p = 0.9; texte = "Préparation du thème…";
-          if (ecoule >= DUREE_MIN) { p = 1; texte = "Prêt"; }
-        }
-      }
-    }
-    progres(p, texte);
-    if (p === 1 || ecoule >= DUREE_MAX) {
-      clearInterval(suivi);
-      progres(1, "Prêt");
-      setTimeout(terminer, 450);
-    }
-  }, 150);
-
   function terminer() {
     if (fini) return;
     fini = true;
-    root.classList.add("gta-done");
-    if (splash) {
-      splash.classList.add("fin");
-      setTimeout(() => splash && splash.remove(), 900);
-    }
-    /* Les animations lourdes démarrent après le fondu */
-    setTimeout(demarrerAnimations, 900);
+    root.classList.add("gta-done");          /* fondu des calques CSS + de Spotify */
+    if (splash) splash.classList.add("fin");
+    setTimeout(() => {
+      if (splash) splash.remove();
+      root.classList.add("gta-fini");        /* calques CSS supprimés */
+      demarrerAnimations();                  /* animations lourdes après le fondu */
+    }, 900);
+  }
+
+  if (performance.now() >= DUREE_MAX) {
+    /* Script arrivé trop tard : l'écran CSS est déjà terminé, on ne le relance pas */
+    fini = true;
+    root.classList.add("gta-done", "gta-fini");
+    setTimeout(demarrerAnimations, 0);
+  } else {
+    if (document.body) creerSplash();
+    else document.addEventListener("DOMContentLoaded", creerSplash, { once: true });
+
+    const suivi = setInterval(() => {
+      creerSplash();
+      const S = window.Spicetify;
+      const ecoule = performance.now();
+      let p = 0.15, texte = "Démarrage…";
+      if (S && S.Player) {
+        p = 0.4; texte = "Connexion à Spotify…";
+        const vue = document.getElementById("main-view");
+        if (vue && vue.querySelector("section, [data-testid]")) {
+          p = 0.7; texte = "Chargement de l'interface…";
+          if (S.colorExtractor && S.Platform) {
+            p = 0.9; texte = "Préparation du thème…";
+            if (ecoule >= DUREE_MIN) { p = 1; texte = "Prêt"; }
+          }
+        }
+      }
+      progres(p, texte);
+      if (p === 1 || ecoule >= DUREE_MAX) {
+        clearInterval(suivi);
+        progres(1, "Prêt");
+        setTimeout(terminer, 350);
+      }
+    }, 150);
   }
 
   /* ===== 3. THÈME (préparé derrière l'écran de démarrage) ===== */
