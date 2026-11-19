@@ -207,6 +207,106 @@
   }
   initTheme();
 
+  /* ===== 4. PANNEAU DE DROITE : GLISSEMENT À L'OUVERTURE / FERMETURE =====
+     Spotify ne fait que basculer une classe (.Root__right-sidebar-expanded) :
+     le panneau apparaît / disparaît d'un coup. Ici, technique « FLIP » : on
+     laisse Spotify changer la mise en page, puis, avant l'affichage de l'image,
+     on replace le panneau à son ancienne position et on l'anime jusqu'à la
+     nouvelle, en transform / opacity uniquement (calculé par le GPU).
+       ouverture : le panneau sort de la languette repliée et glisse en place
+       fermeture : le panneau garde sa largeur et glisse hors de l'écran,
+                   pendant que la languette de verre apparaît */
+  const EASE_ENTREE = "cubic-bezier(0.25, 0.8, 0.25, 1)";   /* arrive vite, se pose en douceur */
+  const EASE_SORTIE = "cubic-bezier(0.4, 0, 0.6, 1)";       /* démarre et finit en douceur */
+  const reduit = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function panneauDroit() {
+    const peek = document.querySelector(".Root__right-sidebar-peek");
+    const contenu = peek && peek.querySelector(":scope .Root__right-sidebar-peekContent");
+    if (!contenu) { setTimeout(panneauDroit, 500); return; }
+    let ouvert = peek.classList.contains("Root__right-sidebar-expanded");
+    let anim = null;
+    let fin = null;
+    /* Bord droit du panneau ouvert, mémorisé : une fois replié, on ne peut
+       plus le mesurer (l'enveloppe ne fait plus que 40 px). */
+    let bordOuvert = 0;
+    const memoriser = () => { if (ouvert && !anim) bordOuvert = peek.getBoundingClientRect().right; };
+    memoriser();
+    window.addEventListener("resize", memoriser, { passive: true });
+
+    const nettoyer = () => {
+      if (anim) { anim.cancel(); anim = null; }
+      if (fin) { fin(); fin = null; }
+    };
+
+    const obs = new MutationObserver(() => {
+      const maintenant = peek.classList.contains("Root__right-sidebar-expanded");
+      if (maintenant === ouvert) return;
+      ouvert = maintenant;
+      nettoyer();
+      if (ouvert) memoriser();
+      if (reduit.matches || document.hidden) return;
+      let voileAnim = null;
+
+      if (ouvert) {
+        /* Départ : bord gauche du panneau à l'endroit de la languette (40 px) */
+        const r = contenu.getBoundingClientRect();
+        const dx = Math.max(0, bordOuvert - 40 - r.left);
+        anim = contenu.animate(
+          [{ transform: `translateX(${dx}px)` }, { transform: "none" }],
+          { duration: 450, easing: EASE_ENTREE });
+      } else {
+        if (!bordOuvert) return;
+        /* Le contenu garde sa largeur d'origine le temps de sortir. On neutralise
+           le décalage que Spotify lui applique une fois replié pour mesurer sa
+           vraie position, puis on le replace pile sur l'ancien panneau. */
+        const largeur = (contenu.firstElementChild || contenu).offsetWidth;
+        peek.setAttribute("data-gta-sortie", "");   /* attribut : React réécrit la classe */
+        contenu.style.width = largeur + "px";
+        contenu.style.transform = "none";
+        const depart = bordOuvert - contenu.getBoundingClientRect().right;
+        const voile = peek.querySelector(":scope .Root__right-sidebar-overlayWrapper > :last-child");
+        anim = contenu.animate(
+          [{ transform: `translateX(${depart}px)`, opacity: 1 },
+           { transform: `translateX(${depart + largeur}px)`, opacity: 0.2 }],
+          { duration: 400, easing: EASE_SORTIE, fill: "forwards" });
+        voileAnim = voile && voile.animate(
+          [{ opacity: 0 }, { opacity: 0, offset: 0.5 }, { opacity: 1 }],
+          { duration: 400, easing: "ease-out" });
+        fin = () => {
+          if (voileAnim) voileAnim.cancel();
+          contenu.style.width = "";
+          contenu.style.transform = "";
+          peek.removeAttribute("data-gta-sortie");
+        };
+      }
+      /* Spotify bloque le fil principal ~150-250 ms juste après le changement
+         (nouveau rendu) : lancée tout de suite, l'animation serait déjà à
+         moitié finie à la première image affichée. On la fige sur sa position
+         de départ et on ne la lance qu'à l'image suivante. */
+      const a = anim;
+      const voileA = voileAnim;
+      a.pause(); if (voileA) voileA.pause();
+      requestAnimationFrame(() => {
+        if (anim !== a) return;
+        a.play(); if (voileA) voileA.play();
+      });
+      a.finished.then(() => {
+        if (anim !== a) return;
+        anim = null;
+        a.cancel();               /* rend la main au CSS (fill: forwards sinon figé) */
+        if (fin) { fin(); fin = null; }
+      }, () => {});
+    });
+    obs.observe(peek, { attributes: true, attributeFilter: ["class"] });
+    /* Si Spotify recrée le panneau (mode cinéma…), on se rebranche dessus */
+    const veille = setInterval(() => {
+      if (peek.isConnected) return;
+      clearInterval(veille); obs.disconnect(); nettoyer();
+      panneauDroit();
+    }, 2000);
+  }
+  panneauDroit();
+
   /* Pas de parallaxe : le fond doit rester immobile pour que le verre
      précalculé des panneaux reste aligné, et pour ne rien redessiner. */
   function demarrerAnimations() {

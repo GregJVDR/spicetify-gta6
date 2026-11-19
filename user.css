@@ -184,8 +184,19 @@ aside[data-testid="now-playing-bar"] {
 }
 /* Le contenu du panneau, inactif et caché sous le calque quand il est replié,
    transparaissait à travers le verre : on ne le peint plus. */
-.Root__right-sidebar-peekContent[aria-hidden="true"] {
+.Root__right-sidebar-peek:not([data-gta-sortie]) .Root__right-sidebar-peekContent[aria-hidden="true"] {
   visibility: hidden;
+}
+/* Ouverture / fermeture animées par theme.js (glissement en transform) :
+   la transition de Spotify sur ce bloc (0,2 s) se superposerait à la nôtre. */
+.Root__right-sidebar-peekContent {
+  transition: none !important;
+}
+/* Pendant la sortie, seule la plaque de verre glisse : Spotify (et les
+   extensions de paroles) ont déjà remplacé le contenu à ce moment-là, le
+   montrer donnerait un mélange de textes par-dessus la vue principale. */
+[data-gta-sortie] #Desktop_PanelContainer_Id > * {
+  visibility: hidden !important;
 }
 /* Fausse jointure pleine (couleur sidebar) qui apparaît au survol : inutile
    avec des panneaux transparents. */
