@@ -300,6 +300,93 @@ aside[data-testid="now-playing-bar"] {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
+/* ===== BOUTONS RONDS « SURÉLEVÉS » (Accueil, Créer +, flèches de défilement…) =====
+   Ils sont peints avec --background-elevated-base (violet sombre opaque).
+   Redéfinie UNIQUEMENT dans la barre du haut et les panneaux : les menus,
+   popovers et infobulles sont rendus ailleurs dans la page et gardent leur
+   fond sombre, nécessaire à la lisibilité (aucun flou derrière). */
+#global-nav-bar,
+#Desktop_LeftSidebar_Id,
+#main-view,
+#Desktop_PanelContainer_Id,
+:is(#global-nav-bar, #Desktop_LeftSidebar_Id, #main-view, #Desktop_PanelContainer_Id) :is(.encore-dark-theme, .encore-base-set) {
+  --background-elevated-base: rgba(255, 255, 255, 0.10) !important;
+  --background-elevated-highlight: rgba(255, 255, 255, 0.18) !important;
+  --background-elevated-press: rgba(255, 255, 255, 0.06) !important;
+  --chevrons-button-color: rgba(255, 255, 255, 0.12);
+}
+/* Bouton « Ouvrir la Bibliothèque » (bibliothèque repliée) : pastille opaque
+   (--background-base) derrière l'icône. Classe générée + secours. */
+.i5UqOWvaBT2XW_amYv2y,
+#Desktop_LeftSidebar_Id button > span:only-child:has(> svg) {
+  background-color: transparent !important;
+}
+/* Voile noir de la barre du haut (pages d'applis : Marketplace…) */
+.main-topBar-overlay {
+  background-color: transparent !important;
+}
+/* Barre collée en haut de l'accueil (pastilles Tout / Musique…) quand on
+   défile : voile noir à 60 %. Remplacé par un verre léger, juste assez teinté
+   pour que les titres qui passent dessous ne se mélangent pas aux pastilles.
+   Classes générées : aucun attribut stable. */
+.DaFzhRDyNpM9dr4DBTM9 {
+  background-color: transparent !important;
+}
+.DaFzhRDyNpM9dr4DBTM9.yWcUXGl4e5ZmkcWnVpkA::after {
+  background: linear-gradient(rgba(16, 9, 34, 0.45), rgba(16, 9, 34, 0.3)) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* ===== MARKETPLACE (classes de l'appli Marketplace, stables) ===== */
+.marketplace-header {
+  background-color: transparent !important;
+}
+/* Boutons, menu déroulant, recherche : pastilles de verre */
+.marketplace-header-icon-button,
+.Dropdown-control,
+.searchbar-bar,
+.marketplace-tabBar-headerItemLink {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.marketplace-header-icon-button:hover,
+.Dropdown-control:hover,
+.marketplace-tabBar-headerItemLink:hover {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+}
+.marketplace-tabBar-active {
+  background-color: color-mix(in srgb, var(--accent) 60%, rgba(255, 255, 255, 0.1)) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+/* Liste ouverte du menu déroulant : reste lisible (texte au-dessus des cartes) */
+.Dropdown-menu {
+  background-color: var(--spice-main-elevated) !important;
+  border: 1px solid var(--verre-bord) !important;
+  border-radius: 12px;
+}
+/* Cartes de thèmes / extensions : plaque de verre au lieu d'un fond opaque.
+   (Le Marketplace donne aussi un fond opaque à TOUTES les .main-card-card
+   une fois chargé : on le retire partout.) */
+.main-card-card {
+  background: transparent !important;
+}
+.marketplace-grid .main-card-card,
+[class*="marketplace-card"].main-card-card {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.03)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+/* Badges (latest, version…) en verre ; « JS externe » garde son rouge d'alerte */
+.marketplace-grid .main-card-draggable .main-card-cardMetadata li.marketplace-card__tag:not([data-tag="external JS"]),
+.marketplace-card__tag:not([data-tag="external JS"]) {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+.searchbar-bar::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
 /* ===== PASTILLES DE FILTRE (Playlists, Podcasts, Albums…) ===== */
 [class*="-chip__inner"] {
   background: rgba(255, 255, 255, 0.08) !important;
