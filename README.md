@@ -25,11 +25,29 @@ Thème Spotify « Vice City » au style *liquid glass* : panneaux en verre teint
 
 ## Installation
 
-### Depuis le Marketplace Spicetify (recommandé)
+### Installation rapide (recommandée : écran de chargement instantané)
+
+Une seule commande installe le thème directement dans Spotify (et le met à jour si vous la relancez) :
+
+macOS / Linux :
+
+```bash
+curl -fsSL https://gregjvdr.github.io/spicetify-gta6/install.sh | sh
+```
+
+Windows (PowerShell) :
+
+```powershell
+iwr -useb https://gregjvdr.github.io/spicetify-gta6/install.ps1 | iex
+```
+
+### Depuis le Marketplace Spicetify
 
 1. Installez le [Marketplace Spicetify](https://github.com/spicetify/marketplace) si ce n'est pas déjà fait.
 2. Dans Spotify, ouvrez **Marketplace** → onglet **Themes**.
 3. Cherchez **GTA6** et cliquez sur **Install**.
+
+> Avec le Marketplace, Spotify peut s'afficher une fraction de seconde avant l'écran de chargement : le Marketplace télécharge le thème à chaque lancement, après le démarrage de Spotify. L'installation rapide ou manuelle n'a pas ce délai.
 
 ### Installation manuelle
 
