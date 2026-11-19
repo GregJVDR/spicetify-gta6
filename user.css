@@ -516,7 +516,7 @@ aside[data-testid="now-playing-bar"] img {
      body::before  le logo (entrée)
    theme.js ajoute ensuite par-dessus le reflet du logo, le titre, la barre
    et le texte de progression, puis pose html.gta-done (fondu) et
-   html.gta-fini (calques supprimés). Sans JS : fin automatique à 8 s.
+   html.gta-fini (calques supprimés). Sans JS : fin automatique à 10,5 s.
    ========================================================= */
 :root {
   --sp-left: 7vw;                                   /* bloc à gauche : personnages au centre-droit */
@@ -525,10 +525,10 @@ aside[data-testid="now-playing-bar"] img {
   --sp-top: calc(50vh - (var(--sp-logo-h) + 100px) / 2);   /* haut du logo (bloc centré verticalement) */
 }
 
-/* Spotify caché tant que le chargement n'est pas fini (sécurité : 8 s) */
+/* Spotify caché tant que le chargement n'est pas fini (sécurité : 10,5 s) */
 html:not(.gta-done) #main {
   opacity: 0;
-  animation: gta-secours 0.01s 8s forwards;
+  animation: gta-secours 0.01s 10.5s forwards;
 }
 @keyframes gta-secours { to { opacity: 1; } }
 
@@ -554,7 +554,7 @@ html.gta-fini body::before,
 html.gta-fini body::after {
   content: none;
 }
-/* Sans JS : fondu automatique à 8 s */
+/* Sans JS : fondu automatique à 10,5 s */
 @keyframes splash-secours { to { opacity: 0; visibility: hidden; } }
 
 /* 1. Image de chargement (repli : dégradé GTA6) */
@@ -569,7 +569,7 @@ html::before {
   transform-origin: 65% 40%;
   animation:
     splash-zoom 9s cubic-bezier(0.2, 0.6, 0.3, 1) both,
-    splash-secours 0.8s ease 8s forwards;
+    splash-secours 0.8s ease 10.5s forwards;
 }
 @keyframes splash-zoom {
   from { transform: scale(1.12); }
@@ -587,7 +587,7 @@ html::after {
   transform: translate(-50%, -50%);
   animation:
     splash-halo 2.4s ease-in-out 10 alternate,
-    splash-secours 0.8s ease 8s forwards;
+    splash-secours 0.8s ease 10.5s forwards;
 }
 @keyframes splash-halo {
   from { transform: translate(-50%, -50%) scale(0.85); }
@@ -605,7 +605,7 @@ body::after {
   transform: scale(1.15);
   animation:
     logo-lueur 2.4s ease-in-out 1.1s 10 alternate backwards,
-    splash-secours 0.8s ease 8s forwards;
+    splash-secours 0.8s ease 10.5s forwards;
 }
 @keyframes logo-lueur {
   from { transform: scale(1.05); }
@@ -623,7 +623,7 @@ body::before {
   filter: drop-shadow(0 0 18px rgba(255, 79, 163, 0.7));
   animation:
     logo-entree 1.1s cubic-bezier(0.2, 0.9, 0.25, 1.2) backwards,
-    splash-secours 0.8s ease 8s forwards;
+    splash-secours 0.8s ease 10.5s forwards;
 }
 @keyframes logo-entree {
   0%   { opacity: 0; transform: scale(0.6) rotate(-6deg); }
@@ -744,13 +744,13 @@ body::before {
   }
   /* La sécurité de l'écran de démarrage doit rester active */
   html:not(.gta-done) #main {
-    animation: gta-secours 0.01s 8s forwards !important;
+    animation: gta-secours 0.01s 10.5s forwards !important;
   }
   html:not(.gta-done)::before,
   html:not(.gta-done)::after,
   html:not(.gta-done) body::before,
   html:not(.gta-done) body::after {
-    animation: splash-secours 0.01s 8s forwards !important;
+    animation: splash-secours 0.01s 10.5s forwards !important;
   }
   .main-card-card:hover,
   .main-trackList-trackListRow:hover,
