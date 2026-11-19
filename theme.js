@@ -44,6 +44,24 @@
     }, 900);
   }
 
+  /* Le logo et l'image de chargement peuvent venir d'Internet (installation
+     Marketplace) : on attend qu'ils soient téléchargés avant de terminer,
+     pour ne jamais finir sur un écran sans logo ni image (3 s maximum). */
+  const debutScript = performance.now();
+  const MIN_APRES_SCRIPT = 1200;   /* l'écran reste visible au moins 1,2 s après l'arrivée du script */
+  let imagesPretes = false;
+  (function precharger() {
+    const cs = getComputedStyle(root);
+    const urls = ["--splash", "--logo"]
+      .map((v) => (cs.getPropertyValue(v).match(/url\(\s*["']?([^"')]+)["']?\s*\)/) || [])[1])
+      .filter(Boolean);
+    if (!urls.length) { imagesPretes = true; return; }
+    let reste = urls.length;
+    const une = () => { if (--reste <= 0) imagesPretes = true; };
+    urls.forEach((u) => { const img = new Image(); img.onload = img.onerror = une; img.src = u; });
+    setTimeout(() => { imagesPretes = true; }, 3000);
+  })();
+
   if (performance.now() >= DUREE_MAX) {
     /* Script arrivé trop tard : l'écran CSS est déjà terminé, on ne le relance pas */
     fini = true;
@@ -65,7 +83,8 @@
           p = 0.7; texte = "Chargement de l'interface…";
           if (S.colorExtractor && S.Platform) {
             p = 0.9; texte = "Préparation du thème…";
-            if (ecoule >= DUREE_MIN) { p = 1; texte = "Prêt"; }
+            if (ecoule >= DUREE_MIN && imagesPretes &&
+                ecoule - debutScript >= MIN_APRES_SCRIPT) { p = 1; texte = "Prêt"; }
           }
         }
       }
