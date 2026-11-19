@@ -71,9 +71,60 @@
   };
 
   /* ===== 2. SUIVI DU VRAI CHARGEMENT ===== */
+  /* ===== PASSAGE DU « VI » (fin du chargement) =====
+     Un grand VI semi-transparent traverse l'écran de gauche à droite pendant
+     que l'écran de chargement s'efface : traînée de copies estompées + traits
+     de vitesse. Dessiné en SVG (net à toute taille), animé en transform /
+     opacity uniquement, supprimé dès la fin (~1,3 s). */
+  const VI_SVG =
+    '<svg viewBox="-40 -40 1060 880" aria-hidden="true">' +
+      '<defs>' +
+        '<linearGradient id="gta-vi-degrade" x1="0" y1="0" x2="0.25" y2="1">' +
+          '<stop offset="0" stop-color="#3b10e0"/>' +
+          '<stop offset="0.35" stop-color="#a63fe8"/>' +
+          '<stop offset="0.6" stop-color="#ff3fb8"/>' +
+          '<stop offset="0.85" stop-color="#ff8a50"/>' +
+          '<stop offset="1" stop-color="#9df5c0"/>' +
+        '</linearGradient>' +
+        '<g id="gta-vi-forme">' +
+          '<polygon points="0,0 300,0 440,470 560,0 690,0 440,800"/>' +
+          '<rect x="720" y="0" width="260" height="800"/>' +
+        '</g>' +
+      '</defs>' +
+      '<use href="#gta-vi-forme" fill="#2b0b3d" stroke="#2b0b3d" stroke-width="56" stroke-linejoin="round"/>' +
+      '<use href="#gta-vi-forme" fill="url(#gta-vi-degrade)" stroke="#fff6dc" stroke-width="14" stroke-linejoin="round"/>' +
+    '</svg>';
+  function passageVI() {
+    if (!document.body) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const d = document.createElement("div");
+    d.id = "gta-vi";
+    /* Traits de vitesse : hauteur, longueur, retard, couleur variés */
+    const traits = [
+      [14, 38, 0.00, "255,255,255"], [21, 55, 0.10, "255,79,163"],
+      [29, 30, 0.04, "255,255,255"], [36, 62, 0.16, "46,196,214"],
+      [43, 45, 0.02, "255,255,255"], [52, 70, 0.12, "255,79,163"],
+      [60, 42, 0.06, "255,255,255"], [67, 50, 0.18, "255,138,61"],
+      [75, 34, 0.03, "255,255,255"], [83, 58, 0.14, "46,196,214"],
+      [90, 36, 0.08, "255,255,255"],
+    ].map(([y, w, t, c]) =>
+      `<span style="--y:${y}%;--w:${w}vw;--t:${t}s;--c:${c}"></span>`).join("");
+    d.innerHTML =
+      '<div class="gta-vi-traits">' + traits + '</div>' +
+      '<div class="gta-vi-bloc">' +
+        '<div class="gta-vi-fantome" style="--n:3"><svg viewBox="-40 -40 1060 880"><use href="#gta-vi-forme" fill="url(#gta-vi-degrade)"/></svg></div>' +
+        '<div class="gta-vi-fantome" style="--n:2"><svg viewBox="-40 -40 1060 880"><use href="#gta-vi-forme" fill="url(#gta-vi-degrade)"/></svg></div>' +
+        '<div class="gta-vi-fantome" style="--n:1"><svg viewBox="-40 -40 1060 880"><use href="#gta-vi-forme" fill="url(#gta-vi-degrade)"/></svg></div>' +
+        '<div class="gta-vi-lettres">' + VI_SVG + '</div>' +
+      '</div>';
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 1600);
+  }
+
   function terminer() {
     if (fini) return;
     fini = true;
+    passageVI();                             /* le VI traverse pendant le fondu */
     root.classList.add("gta-done");          /* fondu des calques CSS + de Spotify */
     if (splash) splash.classList.add("fin");
     setTimeout(() => {
