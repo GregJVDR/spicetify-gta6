@@ -90,6 +90,79 @@ div:has(> #global-nav-bar),
     linear-gradient(135deg, #2b0f4c, #7B2FBE 35%, #FF4FA3 65%, #FF8A3D);
 }
 
+/* ===== ÉTOILES QUI DÉFILENT =====
+   Deux calques posés sur l'image de fond (pseudo-éléments de #gta-bg) :
+     ::before  petites étoiles pâles, lentes (lointaines)
+     ::after   étoiles plus grosses et colorées, plus rapides (proches)
+   Chaque calque est un motif répété, plus grand que l'écran d'une case, qui
+   glisse d'une case en diagonale puis recommence : la boucle est invisible.
+   Uniquement transform → animé par le GPU, aucun redessin. Le verre étant
+   une simple teinte (pas de flou), rien n'est recalculé derrière les panneaux.
+   En pause quand Spotify n'est pas au premier plan ; coupé si « Réduire les
+   animations » est activé. */
+:root {
+  --etoiles-opacite: 0.9;     /* 0 = invisibles */
+  --etoiles-vitesse: 1;       /* 2 = deux fois plus lent */
+}
+#gta-bg {
+  overflow: hidden;
+}
+#gta-bg::before,
+#gta-bg::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  opacity: var(--etoiles-opacite);
+  backface-visibility: hidden;
+}
+#gta-bg::before {
+  inset: -220px 0 0 -220px;            /* une case de marge du côté d'où viennent les étoiles */
+  /* chaque étoile : cœur net + petit halo (un simple dégradé de 1 px
+     disparaissait dans le ciel rose) */
+  background-image:
+    radial-gradient(circle at 20px 30px, #fff 0 0.9px, color-mix(in srgb, #fff 45%, transparent) 1.5px, transparent 2.2px),
+    radial-gradient(circle at 90px 150px, #fff 0 0.9px, color-mix(in srgb, #fff 45%, transparent) 1.5px, transparent 2.2px),
+    radial-gradient(circle at 150px 60px, #ffe2f1 0 0.9px, color-mix(in srgb, #ffe2f1 45%, transparent) 1.5px, transparent 2.2px),
+    radial-gradient(circle at 190px 190px, #fff 0 0.9px, color-mix(in srgb, #fff 45%, transparent) 1.5px, transparent 2.2px),
+    radial-gradient(circle at 60px 200px, #d9f4ff 0 0.9px, color-mix(in srgb, #d9f4ff 45%, transparent) 1.5px, transparent 2.2px),
+    radial-gradient(circle at 130px 110px, #fff 0 0.9px, color-mix(in srgb, #fff 45%, transparent) 1.5px, transparent 2.2px),
+    radial-gradient(circle at 205px 95px, #fff 0 0.9px, color-mix(in srgb, #fff 45%, transparent) 1.5px, transparent 2.2px),
+    radial-gradient(circle at 35px 120px, #ffe2f1 0 0.9px, color-mix(in srgb, #ffe2f1 45%, transparent) 1.5px, transparent 2.2px);
+  background-size: 220px 220px;
+}
+#gta-bg::after {
+  inset: -360px 0 0 -360px;
+  background-image:
+    radial-gradient(circle at 40px 70px, #fff 0 1.4px, color-mix(in srgb, #fff 45%, transparent) 2.0px, transparent 3.4px),
+    radial-gradient(circle at 230px 40px, var(--rose) 0 1.4px, color-mix(in srgb, var(--rose) 45%, transparent) 2.0px, transparent 3.4px),
+    radial-gradient(circle at 300px 250px, #fff 0 1.4px, color-mix(in srgb, #fff 45%, transparent) 2.0px, transparent 3.4px),
+    radial-gradient(circle at 120px 300px, var(--turquoise) 0 1.4px, color-mix(in srgb, var(--turquoise) 45%, transparent) 2.0px, transparent 3.4px),
+    radial-gradient(circle at 190px 170px, #ffe9c9 0 1.4px, color-mix(in srgb, #ffe9c9 45%, transparent) 2.0px, transparent 3.4px),
+    radial-gradient(circle at 330px 120px, #fff 0 1.4px, color-mix(in srgb, #fff 45%, transparent) 2.0px, transparent 3.4px);
+  background-size: 360px 360px;
+}
+/* Après l'écran de démarrage seulement (rien ne bouge pendant le chargement) */
+html.gta-ready #gta-bg::before {
+  will-change: transform;
+  animation: etoiles-loin calc(60s * var(--etoiles-vitesse)) linear infinite;
+}
+html.gta-ready #gta-bg::after {
+  will-change: transform;
+  animation: etoiles-pres calc(45s * var(--etoiles-vitesse)) linear infinite;
+}
+@keyframes etoiles-loin {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(220px, 220px, 0); }
+}
+@keyframes etoiles-pres {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(360px, 360px, 0); }
+}
+html.gta-pause #gta-bg::before,
+html.gta-pause #gta-bg::after {
+  animation-play-state: paused;
+}
+
 /* ===== TEINTE DE LA POCHETTE (fixe : pas d'animation derrière le verre) ===== */
 #main::before {
   content: "";
