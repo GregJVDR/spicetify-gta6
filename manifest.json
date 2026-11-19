@@ -1,6 +1,6 @@
 {
   "name": "GTA6",
-  "description": "Thème Vice City « liquid glass » : panneaux en verre teinté, couleurs qui suivent la pochette, écran de démarrage animé, boutons du lecteur animés. Optimisé : animations uniquement en transform/opacity, pause quand Spotify est en arrière-plan.",
+  "description": "Vice City liquid-glass theme: tinted glass panels, cover-based accent colors, animated loading screen and player controls. Lightweight: transform/opacity-only animations, paused in the background. · Thème Vice City « liquid glass » : verre teinté, couleurs selon la pochette, écran de chargement animé.",
   "preview": "captures/preview.png",
   "readme": "README.md",
   "usercss": "https://gregjvdr.github.io/spicetify-gta6/user.css",
