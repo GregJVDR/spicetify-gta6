@@ -157,6 +157,16 @@ aside[data-testid="now-playing-bar"] {
 .SwoI_U_X4O3wXD7db3su::before {
   background: transparent !important;
 }
+/* Enveloppe du panneau de droite (classes lisibles de Spotify, vérifiées dans
+   le bundle) : fond opaque --background-base et coins à 8 px, qui dépassaient
+   en noir dans les coins arrondis du verre. :has() = secours si elles changent. */
+.Root__right-sidebar-peek,
+.Root__right-sidebar-overlayWrapper,
+.Root__right-sidebar-peekContent,
+:has(> #Desktop_PanelContainer_Id) {
+  background: transparent !important;
+  border-radius: var(--rayon) !important;
+}
 /* Tout ce qui, dans le panneau de droite, est peint avec la couleur de base
    (en-tête qui s'assombrit au défilement, conteneurs aux coins arrondis
    différents du panneau…) devient transparent. Les boutons ne sont pas
