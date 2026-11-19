@@ -1,6 +1,6 @@
 /* GTA6 — thème Spicetify · https://github.com/GregJVDR/spicetify-gta6
    Fichier généré par scripts/sync.sh : modifier la version source, pas ce fichier. */
-:root { --fond: url("https://www.rockstargames.com/VI/_next/static/media/Jason_Lucia_Lock_And_Load_landscape.0l9s5w7ih9p~3.jpg"); --splash: url("https://www.rockstargames.com/VI/_next/static/media/Jason_and_Lucia_Beach_landscape.0419q._86ukpt.jpg"); --logo: url("https://raw.githubusercontent.com/GregJVDR/spicetify-gta6/main/logo.webp"); }
+:root { --fond: url("https://www.rockstargames.com/VI/_next/static/media/Jason_Lucia_Lock_And_Load_landscape.0l9s5w7ih9p~3.jpg"); --splash: url("https://www.rockstargames.com/VI/_next/static/media/Jason_and_Lucia_Beach_landscape.0419q._86ukpt.jpg"); --logo: url("https://raw.githubusercontent.com/GregJVDR/spicetify-gta6/main/logo.webp"); --like: url("https://raw.githubusercontent.com/GregJVDR/spicetify-gta6/main/like.webp"); }
 /* =========================================================
    GTA VI — Spicetify mod · style « Liquid Glass »
    Règles :
@@ -703,6 +703,25 @@ html.gta-lecture [data-testid="control-button-playpause"]::after {
 aside[data-testid="now-playing-bar"] img {
   border-radius: 10px;
   box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+/* ===== POCHETTE « TITRES LIKÉS » =====
+   Spotify l'affiche partout avec <img src="…misc.scdn.co/liked-songs/…">
+   (bibliothèque, accueil, en-tête de la playlist, lecteur). « content: url »
+   remplace l'image affichée par une balise <img> : aucun JS nécessaire.
+   L'image est détourée : on retire le fond de la case et l'ombre carrée,
+   remplacée par une ombre qui suit la forme du logo. */
+img[src*="/liked-songs/"] {
+  content: var(--like);
+  object-fit: contain;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+}
+:has(> img[src*="/liked-songs/"]) {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 ::selection {

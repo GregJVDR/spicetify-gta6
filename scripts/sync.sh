@@ -13,23 +13,25 @@ DEPOT_RAW="https://raw.githubusercontent.com/GregJVDR/spicetify-gta6/main"
 URL_FOND="https://www.rockstargames.com/VI/_next/static/media/Jason_Lucia_Lock_And_Load_landscape.0l9s5w7ih9p~3.jpg"
 URL_SPLASH="https://www.rockstargames.com/VI/_next/static/media/Jason_and_Lucia_Beach_landscape.0419q._86ukpt.jpg"
 URL_LOGO="$DEPOT_RAW/logo.webp"
+URL_LIKE="$DEPOT_RAW/like.webp"   # pochette de « Titres likés »
 
-for f in style.css color.ini theme.js logo.webp; do
+for f in style.css color.ini theme.js logo.webp like.webp; do
   [[ -f "$PERSO/$f" ]] || { echo "Introuvable : $PERSO/$f" >&2; exit 1; }
 done
 
 cp "$PERSO/color.ini" color.ini
 cp "$PERSO/theme.js"  theme.js
 cp "$PERSO/logo.webp" logo.webp
+cp "$PERSO/like.webp" like.webp
 
 {
   printf '/* GTA6 — thème Spicetify · https://github.com/GregJVDR/spicetify-gta6\n'
   printf '   Fichier généré par scripts/sync.sh : modifier la version source, pas ce fichier. */\n'
-  printf ':root { --fond: url("%s"); --splash: url("%s"); --logo: url("%s"); }\n' \
-    "$URL_FOND" "$URL_SPLASH" "$URL_LOGO"
+  printf ':root { --fond: url("%s"); --splash: url("%s"); --logo: url("%s"); --like: url("%s"); }\n' \
+    "$URL_FOND" "$URL_SPLASH" "$URL_LOGO" "$URL_LIKE"
   cat "$PERSO/style.css"
 } > user.css.tmp
 mv user.css.tmp user.css
 
 echo "Synchronisé depuis $PERSO"
-ls -la user.css color.ini theme.js logo.webp
+ls -la user.css color.ini theme.js logo.webp like.webp
